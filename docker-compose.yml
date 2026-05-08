@@ -4,12 +4,5 @@ services:
     ports:
       - "8000:8000"
     environment:
-      AWS_REGION: us-east-1
+      AWS_REGION: eu-north-1
       READINGS_TABLE: Readings
-    logging:
-      driver: awslogs
-      options:
-        awslogs-region: us-east-1
-        awslogs-group: healthcare-backend-logs
-        awslogs-create-group: "true"
-        awslogs-stream: backend

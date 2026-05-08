@@ -3,7 +3,7 @@ from datetime import datetime
 import boto3
 from boto3.dynamodb.conditions import Key
 
-AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
+AWS_REGION = os.getenv("AWS_REGION", "eu-north-1")
 READINGS_TABLE = os.getenv("READINGS_TABLE", "Readings")
 
 dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
