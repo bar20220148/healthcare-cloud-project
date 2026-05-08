@@ -3,10 +3,13 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
+    environment:
+      AWS_REGION: us-east-1
+      READINGS_TABLE: Readings
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: us-east-1
+        awslogs-group: healthcare-backend-logs
+        awslogs-create-group: "true"
+        awslogs-stream: backend
