@@ -6,3 +6,10 @@ services:
     environment:
       AWS_REGION: eu-north-1
       READINGS_TABLE: Readings
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-north-1
+        awslogs-group: healthcare-backend-logs
+        awslogs-create-group: "true"
+        awslogs-stream: backend
