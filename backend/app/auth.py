@@ -1,13 +1,9 @@
 from jose import jwt, JWTError
 from fastapi import HTTPException, Header
 from datetime import datetime, timedelta
-import logging
 
 SECRET_KEY = "replace-this-before-submission"
 ALGORITHM = "HS256"
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("healthcare-auth")
 
 users = {
     "patient": {
@@ -27,11 +23,7 @@ users = {
 def login_user(username: str, password: str):
     user = users.get(username)
     if not user or password != user["password"]:
-        logger.error("Invalid credentials")
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    logger.info("Login success for user %s", username)
-
     payload = {
         "sub": user["id"],
         "username": user["username"],
@@ -46,5 +38,4 @@ def get_current_user(authorization: str = Header(...)):
         token = authorization.replace("Bearer ", "")
         return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
-        logger.error("Invalid token")
         raise HTTPException(status_code=401, detail="Invalid token")

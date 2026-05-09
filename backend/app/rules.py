@@ -1,34 +1,25 @@
-from .db import save_alert
+from datetime import datetime
+import uuid
+
+alerts = []
 
 def check_reading_rules(user_id: str, reading: dict):
-    created = []
-
+    now = datetime.utcnow().isoformat()
     if reading["heart_rate"] > 140:
-        created.append(
-            save_alert(
-                user_id=user_id,
-                alert_type="HEART_RATE",
-                message="Abnormally high heart rate detected",
-                severity="high",
-            )
-        )
-
+        alerts.append({
+            "id": str(uuid.uuid4()),
+            "type": "HEART_RATE",
+            "message": "Abnormally high heart rate detected",
+            "severity": "high",
+            "user_id": user_id,
+            "timestamp": now,
+        })
     if reading["spo2"] < 90:
-        created.append(
-            save_alert(
-                user_id=user_id,
-                alert_type="SPO2",
-                message="Low oxygen saturation detected",
-                severity="high",
-            )
-        )
-
-    return created
-
-def add_security_alert(user_id: str, message: str):
-    return save_alert(
-        user_id=user_id,
-        alert_type="SECURITY",
-        message=message,
-        severity="medium",
-    )
+        alerts.append({
+            "id": str(uuid.uuid4()),
+            "type": "SPO2",
+            "message": "Low oxygen saturation detected",
+            "severity": "high",
+            "user_id": user_id,
+            "timestamp": now,
+        })
