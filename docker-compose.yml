@@ -2,23 +2,16 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       AWS_REGION: eu-north-1
       READINGS_TABLE: Readings
       ALERTS_TABLE: Alerts
       S3_BUCKET: healthcare-project-exports
-    logging:
-      driver: awslogs
-      options:
-        awslogs-region: eu-north-1
-        awslogs-group: healthcare-backend-logs
-        awslogs-create-group: "true"
-        awslogs-stream: backend
 
   frontend:
     build: ./frontend
     ports:
-      - "80:80"
+      - "127.0.0.1:8080:80"
     depends_on:
       - backend
