@@ -1,5 +1,6 @@
 from jose import jwt, JWTError
-from fastapi import HTTPException, Header
+from fastapi import HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime, timedelta
 import logging
 
@@ -8,6 +9,8 @@ ALGORITHM = "HS256"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("healthcare-auth")
+
+security = HTTPBearer()
 
 users = {
     "patient": {
@@ -41,9 +44,9 @@ def login_user(username: str, password: str):
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return {"access_token": token, "token_type": "bearer", "role": user["role"]}
 
-def get_current_user(authorization: str = Header(...)):
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
-        token = authorization.replace("Bearer ", "")
+        token = credentials.credentials
         return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
         logger.error("Invalid token")
