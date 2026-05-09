@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime
+from decimal import Decimal
 import boto3
 from boto3.dynamodb.conditions import Key
 
@@ -15,27 +16,38 @@ s3 = boto3.client("s3", region_name=AWS_REGION)
 readings_table = dynamodb.Table(READINGS_TABLE)
 alerts_table = dynamodb.Table(ALERTS_TABLE)
 
+def normalize_value(value):
+    if isinstance(value, Decimal):
+        if value % 1 == 0:
+            return int(value)
+        return float(value)
+    if isinstance(value, list):
+        return [normalize_value(v) for v in value]
+    if isinstance(value, dict):
+        return {k: normalize_value(v) for k, v in value.items()}
+    return value
+
 def save_reading(patient_id: str, data: dict):
     item = {
         "patient_id": patient_id,
         "timestamp": datetime.utcnow().isoformat(),
-        "heart_rate": data["heart_rate"],
-        "temperature": data["temperature"],
-        "spo2": data["spo2"],
+        "heart_rate": int(data["heart_rate"]),
+        "temperature": Decimal(str(data["temperature"])),
+        "spo2": int(data["spo2"]),
         "blood_pressure": data["blood_pressure"],
     }
     readings_table.put_item(Item=item)
-    return item
+    return normalize_value(item)
 
 def get_my_readings(patient_id: str):
     response = readings_table.query(
         KeyConditionExpression=Key("patient_id").eq(patient_id)
     )
-    return response.get("Items", [])
+    return normalize_value(response.get("Items", []))
 
 def get_all_readings():
     response = readings_table.scan()
-    return response.get("Items", [])
+    return normalize_value(response.get("Items", []))
 
 def save_alert(user_id: str, alert_type: str, message: str, severity: str):
     item = {
@@ -46,17 +58,17 @@ def save_alert(user_id: str, alert_type: str, message: str, severity: str):
         "severity": severity,
     }
     alerts_table.put_item(Item=item)
-    return item
+    return normalize_value(item)
 
 def get_alerts_for_user(user_id: str):
     response = alerts_table.query(
         KeyConditionExpression=Key("user_id").eq(user_id)
     )
-    return response.get("Items", [])
+    return normalize_value(response.get("Items", []))
 
 def get_all_alerts():
     response = alerts_table.scan()
-    return response.get("Items", [])
+    return normalize_value(response.get("Items", []))
 
 def export_readings_to_s3(patient_id: str):
     readings = get_my_readings(patient_id)
