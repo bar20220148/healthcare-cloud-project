@@ -20,7 +20,7 @@ app = FastAPI(title="Healthcare Monitoring API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # for demo
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
